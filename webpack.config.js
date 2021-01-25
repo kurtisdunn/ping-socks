@@ -1,7 +1,5 @@
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-
-const HtmlWebPackPlugin = require("html-webpack-plugin");
 const path = require('path');
 
 
@@ -66,7 +64,7 @@ module.exports = {
     new webpack.ContextReplacementPlugin(/\.\/locale$/, 'empty-module', false, /js$/)
   ],
   devServer: {
-    contentBase: './dist',
-    hot: true
+    contentBase: './src',
+    inline: true
   }
 };
