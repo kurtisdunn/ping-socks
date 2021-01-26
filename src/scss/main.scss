@@ -1,0 +1,43 @@
+@import "~bootstrap/scss/bootstrap";
+
+$backgroud: #191b1c;
+$paragraph:  #cac5bd;
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: $backgroud;
+  color: $paragraph;
+}
+a{
+  color: $paragraph;
+  &:hover, &:active{
+    color: $paragraph;
+    text-decoration: underline!important;
+  }
+}
+h1{
+  font-size: 1.5rem
+}
+
+.main{
+  padding: 15px 15px;
+  min-height:100%;
+}
+
+
+@media (min-width: 768px) {
+  .navbar-nav {
+    width: 100%;
+    text-align: center;
+  }
+  .navbar-nav > li {
+    float: none;
+    display: inline-block;
+  }
+  .navbar-nav > li.navbar-right {
+    float: right !important;
+  }
+}
