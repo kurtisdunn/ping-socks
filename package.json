@@ -14,7 +14,10 @@
   "dependencies": {
     "@popperjs/core": "^2.6.0",
     "bootstrap": "^5.0.0-beta1",
+    "chart.js": "^2.9.4",
+    "chartjs-plugin-streaming": "^1.8.0",
     "express": "^4.17.1",
+    "moment": "^2.29.1",
     "ping": "^0.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

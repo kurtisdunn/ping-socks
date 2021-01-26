@@ -12,13 +12,15 @@ module.exports =  class Single{
             console.log("client is ",client.id);
             // //This is handle by current connected client 
             client.emit('messages',{hello:'world'});
-            ping.promise.probe(host, {
-                timeout: 10,
-                extra: ['-i', '2'],
-            }).then(function (res) {
-                console.log(res)
-                client.emit("data", res)
-            });
+            setInterval(() => {
+                ping.promise.probe(host, {
+                    timeout: 10,
+                    extra: ['-i', '2'],
+                }).then(function (res) {
+                    console.log(res)
+                    client.emit("data", res)
+                });
+            }, 3000)
 
             client.on("disconnect",function(){
                 console.log("client disconnected",client.id);
