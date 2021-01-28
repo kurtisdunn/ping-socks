@@ -1,8 +1,7 @@
-import assign from 'object-assign';
 import fetch from '../../utils/fetch';
 
 export default function (data) {
-  return fetch('/api/form/contact', {
+  return fetch('/ping', {
     method: 'post',
     headers: {
       'Content-Type': 'application/json'

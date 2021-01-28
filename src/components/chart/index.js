@@ -1,9 +1,15 @@
+import './index.scss';
 import React from 'react';
-// import './index.scss';
 import moment from 'moment';
 import  Chart from 'chart.js';
 import 'chartjs-plugin-streaming';
 import io from 'socket.io-client';
+import $ from 'jquery';
+import PingPost from '../../api/ping/post'
+
+
+import Input from '../input';
+import Button from '../button';
 
 //TODO Duntion to add create a data set
 //TODO componentDidUnmount remove event listners.
@@ -28,6 +34,7 @@ export default class LineChart extends React.Component {
     this.state = { }
   }
   static getDerivedStateFromProps(props, current_state) {
+    console.log(props)
     if (current_state.data !== props.data) {
       return [{
         id: props.id,
@@ -37,7 +44,8 @@ export default class LineChart extends React.Component {
     return null
   }
   componentDidMount(){
-    console.log('componentDidMount', this.props.data);
+    console.log('componentDidMount', this.state.data);
+
     const that = this;
 
     var color = Chart.helpers.color;
@@ -130,58 +138,86 @@ export default class LineChart extends React.Component {
       });
     }
 
-
-
-
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
 
-    document.getElementById('addDataset').addEventListener('click', function() {
-      var colorName = colorNames[config.data.datasets.length % colorNames.length];
-      var newColor = chartColors[colorName];
-      var newDataset = {
-        label: 'Dataset ' + (config.data.datasets.length + 1),
+
+
+    document.getElementById('new').addEventListener('click', function() {
+      const input = $('#hostsInput').val()
+      console.log(input);
+      PingPost(input).then((res) => {
+        console.log(res);
+      })
+      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
+      // var newColor = chartColors[colorName];
+      // var newDataset = {
+      //   label: 'Dataset ' + (config.data.datasets.length + 1),
         
-        backgroundColor: color(newColor).alpha(0.5).rgbString(),
-        borderColor: newColor,
-        fill: false,
-        lineTension: 0,
-        data: []
-      };
-      config.data.datasets.push(newDataset);
-      window.myChart.update();
-    });
-    
-    document.getElementById('removeDataset').addEventListener('click', function() {
-      config.data.datasets.pop();
-      window.myChart.update();
-    });
-    
-    document.getElementById('addData').addEventListener('click', function() {
-      onRefresh(window.myChart);
-      window.myChart.update();
+      //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
+      //   borderColor: newColor,
+      //   fill: false,
+      //   lineTension: 0,
+      //   data: []
+      // };
+      // config.data.datasets.push(newDataset);
+      // window.myChart.update();
     });
 
-    document.getElementById('randomizeData').addEventListener('click', function() {
-      config.data.datasets.forEach(function(dataset) {
-        dataset.data.forEach(function(dataObj) {
-          dataObj.y = randomScalingFactor();
-        });
-      });
-      window.myChart.update();
-    });
+
+
+    // document.getElementById('addDataset').addEventListener('click', function() {
+
+    //   PingPost(hosts)
+    //   // var colorName = colorNames[config.data.datasets.length % colorNames.length];
+    //   // var newColor = chartColors[colorName];
+    //   // var newDataset = {
+    //   //   label: 'Dataset ' + (config.data.datasets.length + 1),
+        
+    //   //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
+    //   //   borderColor: newColor,
+    //   //   fill: false,
+    //   //   lineTension: 0,
+    //   //   data: []
+    //   // };
+    //   // config.data.datasets.push(newDataset);
+    //   // window.myChart.update();
+    // });
+    
+    // document.getElementById('removeDataset').addEventListener('click', function() {
+    //   config.data.datasets.pop();
+    //   window.myChart.update();
+    // });
+    
+    // document.getElementById('addData').addEventListener('click', function() {
+    //   onRefresh(window.myChart);
+    //   window.myChart.update();
+    // });
+
+    // document.getElementById('randomizeData').addEventListener('click', () => {
+    //     config.data.datasets.forEach(function (dataset) {
+    //       dataset.data.forEach(function (dataObj) {
+    //         dataObj.y = randomScalingFactor();
+    //       });
+    //     });
+    //     window.myChart.update();
+    //   });
     
     
   }
   render() {
     return (
       <div>
+      <div className="d-grid gap-2 d-md-flex justify-content-md-end">
+        <Input type="text" className="form-control" title="Hosts" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
+        <Button className="btn btn-outline-secondary" type="button" id="new">Button</Button>
+      </div>
         <canvas id={this.props.id}></canvas>
         <p className="text-center">
-          <button type="button" className="btn btn-outline-primary btn-sm" id="randomizeData">Randomize Data</button>
+          {/* <button type="button" className="btn btn-outline-primary btn-sm" id="randomizeData">Randomize Data</button>
           <button type="button" className="btn btn-outline-primary btn-sm" id="addDataset">Add Dataset</button>
           <button type="button" className="btn btn-outline-primary btn-sm" id="removeDataset">Remove Dataset</button>
-          <button type="button" className="btn btn-outline-primary btn-sm" id="addData">Add Data</button>
+          <button type="button" className="btn btn-outline-primary btn-sm" id="addData">Add Data</button> */}
         </p>
       </div>
     );

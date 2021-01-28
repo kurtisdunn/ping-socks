@@ -1,14 +1,10 @@
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
-const Single = require('./utils/singleHost')
 const io = require('socket.io')(http);
-
 const webpack = require('webpack');
 const middleware = require('webpack-dev-middleware');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
- //webpack hot reloading middleware
 const compiler = webpack({ 
     entry: './src/components/app/index.js',
     mode: 'development',
@@ -70,10 +66,9 @@ const compiler = webpack({
     }
 }); 
 
-
+const Ping = require('./utils/ping')
 
 //TODO figure out a better way to pass IO to classes. 
-const single = new Single(io, 'google.com');
 // single.ping();
 app.use(middleware(compiler));
 require('./routes')(app);
