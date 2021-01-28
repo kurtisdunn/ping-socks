@@ -13,19 +13,20 @@ export default class Home extends React.Component {
     socket.on("messages",function(data){
       console.log("message is ",data);
       })
-    socket.on("data",function(data){
-      const messages = document.getElementById('messages');
-      $('#messages').append(`<ul>${data.host.toString()}</ul>`);
-    })
+    // socket.on("data",function(data){
+    //   const messages = document.getElementById('messages');
+    //   $('#messages').append(`<ul>${data.host.toString()}</ul>`);
+    // })
 
     socket.on("particular User",function(data){
-      console.log("data from server ",data);
+      console.log("data from server ", data);
+      this.props.data = data;
     })
   }
   render() {
     return (
         <div className="container">
-          <LineChart id="ping1"></LineChart>
+          <LineChart id="ping1"  data={ this.props.data }></LineChart>
           <ul id="messages"></ul>
         </div>
     );

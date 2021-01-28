@@ -3,7 +3,10 @@ import React from 'react';
 import moment from 'moment';
 import  Chart from 'chart.js';
 import 'chartjs-plugin-streaming';
+import io from 'socket.io-client';
 
+//TODO Duntion to add create a data set
+//TODO componentDidUnmount remove event listners.
 
 var chartColors = {
 	red: 'rgb(255, 99, 132)',
@@ -15,13 +18,11 @@ var chartColors = {
 	grey: 'rgb(201, 203, 207)'
 };
 
+var colorNames = Object.keys(chartColors);
+
 function randomScalingFactor() {
 	return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
 }
-
-
-
-
 
 
 
@@ -30,7 +31,18 @@ export default class LineChart extends React.Component {
     super(props);
   }
   componentDidMount(){
-    console.log('test');
+    console.log('componentDidMount');
+
+    const socket = io.connect();
+    socket.on("data",function(data){
+      const messages = document.getElementById('messages');
+      console.log(data)
+      this.props.data ={
+        time: data.time != null ? data.time : null
+      }
+      // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
+    })
+
 
     var color = Chart.helpers.color;
     var config = {
@@ -51,12 +63,19 @@ export default class LineChart extends React.Component {
           fill: false,
           cubicInterpolationMode: 'monotone',
           data: []
+        }, {
+          label: 'Dataset 3 (cubic interpolation)',
+          backgroundColor: color(chartColors.green).alpha(0.5).rgbString(),
+          borderColor: chartColors.green,
+          fill: false,
+          cubicInterpolationMode: 'monotone',
+          data: this.props.data != null ? this.props.data.time : []
         }]
       },
       options: {
         title: {
           display: true,
-          text: 'Line chart (hotizontal scroll) sample'
+          text: 'Ping Times'
         },
         scales: {
           xAxes: [{
@@ -94,6 +113,10 @@ export default class LineChart extends React.Component {
         });
       });
     }
+
+
+
+
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
 
@@ -102,6 +125,7 @@ export default class LineChart extends React.Component {
       var newColor = chartColors[colorName];
       var newDataset = {
         label: 'Dataset ' + (config.data.datasets.length + 1),
+        
         backgroundColor: color(newColor).alpha(0.5).rgbString(),
         borderColor: newColor,
         fill: false,
@@ -121,6 +145,7 @@ export default class LineChart extends React.Component {
       onRefresh(window.myChart);
       window.myChart.update();
     });
+
     document.getElementById('randomizeData').addEventListener('click', function() {
       config.data.datasets.forEach(function(dataset) {
         dataset.data.forEach(function(dataObj) {
@@ -130,7 +155,7 @@ export default class LineChart extends React.Component {
       window.myChart.update();
     });
     
-    var colorNames = Object.keys(chartColors);
+    
   }
   render() {
     return (
