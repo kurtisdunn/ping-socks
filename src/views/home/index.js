@@ -5,27 +5,23 @@ import $ from 'jquery';
 
 import LineChart from '../../components/chart'
 
+const socket = io.connect();
+
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
     console.log('Home extends React.Component: ', props);
-    const socket = io.connect();
-    socket.on("messages",function(data){
-      console.log("message is ",data);
-      })
+  }
+  componentDidMount(){
+    const that = this;
     socket.on("data",function(data){
-      const messages = document.getElementById('messages');
-      $('#messages').append(`<ul>${data.host.toString()}</ul>`);
-    })
-
-    socket.on("particular User",function(data){
-      console.log("data from server ",data);
+      that.setState({'data': data});
     })
   }
   render() {
     return (
         <div className="container">
-          <LineChart id="ping1"></LineChart>
+          <LineChart id="ping1"  data={ this.state != null ? this.state.data : null  }></LineChart>
           <ul id="messages"></ul>
         </div>
     );

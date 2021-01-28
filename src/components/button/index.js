@@ -8,6 +8,7 @@ export default class Button extends React.Component {
   render() {
     return (
         <button
+          id={this.props.id ? this.props.id : undefined}
           onClick = { this.props.onClick ? this.props.onClick : undefined }
           type={ this.props.type ? this.props.type : 'button' }
           style={ this.props.style ? this.props.style : null }
