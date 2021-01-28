@@ -30,16 +30,25 @@ export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
   }
+  static getDerivedStateFromProps(props, current_state) {
+    if (current_state.value !== props.value) {
+      return {
+        value: props.value,
+        computed_prop: heavy_computation(props.value)
+      }
+    }
+    return null
+  }
   componentDidMount(){
-    console.log('componentDidMount');
+    console.log('componentDidMount', this.props.data);
 
     const socket = io.connect();
     socket.on("data",function(data){
       const messages = document.getElementById('messages');
       console.log(data)
-      this.props.data ={
-        time: data.time != null ? data.time : null
-      }
+      // this.props.data ={
+      //   time: data.time != null ? data.time : null
+      // }
       // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
     })
 
