@@ -20,40 +20,42 @@ var chartColors = {
 
 var colorNames = Object.keys(chartColors);
 
-function randomScalingFactor() {
-	return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
-}
-
 
 
 export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
+    this.state = { }
   }
   static getDerivedStateFromProps(props, current_state) {
-    if (current_state.value !== props.value) {
-      return {
-        value: props.value,
-        computed_prop: heavy_computation(props.value)
-      }
+    if (current_state.data !== props.data) {
+      return [{
+        id: props.id,
+        data: props.data
+      }]
     }
     return null
   }
   componentDidMount(){
     console.log('componentDidMount', this.props.data);
-
-    const socket = io.connect();
-    socket.on("data",function(data){
-      const messages = document.getElementById('messages');
-      console.log(data)
-      // this.props.data ={
-      //   time: data.time != null ? data.time : null
-      // }
-      // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
-    })
-
+    const that = this;
 
     var color = Chart.helpers.color;
+
+    // const dataSet = (data) => {
+    //   return Object.assign({}, {
+    //     label: data.label,
+    //     backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
+    //     borderColor: chartColors.red,
+    //     fill: false,
+    //     lineTension: 0,
+    //     borderDash: [8, 4],
+    //     data: []
+    //   })
+    // }
+
+    // console.log(dataSet());  
+
     var config = {
       type: 'line',
       data: {
@@ -114,11 +116,16 @@ export default class LineChart extends React.Component {
       }
     };
 
+    function randomScalingFactor() {
+	    return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
+    }
+
     function onRefresh(chart) {
+
       chart.config.data.datasets.forEach(function(dataset) {
         dataset.data.push({
           x: Date.now(),
-          y: randomScalingFactor()
+          y: that.state[0].data != null ? that.state[0].data.time : randomScalingFactor()
         });
       });
     }
