@@ -6,6 +6,6 @@ export default function (data) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({"data": data})
+    body: JSON.stringify({"data": [data] })
   }).then(r => r);
 }

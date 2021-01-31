@@ -9,11 +9,12 @@ module.exports = function(app, io){
     // New Ping!
     app.post('/api/ping', function(req, res){
 
-        console.log(req);
-      
+        console.log(req.body.data);
+        // console.log(io);
+
         
-        // Ping = new Ping(io, ['127.0.0.1']);
-        
+        const ping = new Ping(io, req.body.data);
+        // ping.newConn()
 
 
         res.status(200).json('success');
@@ -23,6 +24,5 @@ module.exports = function(app, io){
     app.put('/api/ping', function(req, res){
         res.status(200).json({'test': 'test'}) 
 
-        Ping
     });
 }

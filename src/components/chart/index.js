@@ -139,7 +139,7 @@ export default class LineChart extends React.Component {
 
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
-
+    
 
 
     document.getElementById('new').addEventListener('click', function() {
@@ -147,7 +147,17 @@ export default class LineChart extends React.Component {
       console.log(input);
       PingPost(input).then((res) => {
         console.log(res);
-      })
+      });
+
+      const socket = io.connect();
+      socket.on("data",function(data){
+        // const messages = document.getElementById('messages');
+        console.log('socket.on("data"', data)
+        this.props.data ={
+          time: data.time != null ? data.time : null
+        }
+        // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
+      });
       // var colorName = colorNames[config.data.datasets.length % colorNames.length];
       // var newColor = chartColors[colorName];
       // var newDataset = {
