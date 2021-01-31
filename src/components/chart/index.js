@@ -7,7 +7,6 @@ import io from 'socket.io-client';
 import $ from 'jquery';
 import PingPost from '../../api/ping/post'
 
-
 import Input from '../input';
 import Button from '../button';
 
@@ -209,8 +208,8 @@ export default class LineChart extends React.Component {
     return (
       <div>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Input type="text" className="form-control" title="Hosts" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
-        <Button className="btn btn-outline-secondary" type="button" id="new">Button</Button>
+        <Input type="text" class="transparent-input" title="Hosts" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
+        <Button class="btn-outline-secondary" type="button" id="new">Button</Button>
       </div>
         <canvas id={this.props.id}></canvas>
         <p className="text-center">

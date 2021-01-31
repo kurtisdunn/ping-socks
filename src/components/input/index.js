@@ -50,7 +50,7 @@ export default class Input extends React.Component {
     return (
 
       <div className={`${ hasErrors ? 'has-danger' : ''}`}>
-        <input data-validators={ this.props.validator ? this.props.validator : '' } type={ this.props.type ? this.props.type : 'text' }  className={`form-control ${ hasErrors ? 'form-control-danger' : ''}`} name={ this.props.name ? this.props.name : '' } id={ this.props.name ? this.props.name : '' } placeholder={ this.props.title ? this.props.title : '' } onChange={ this.handleChange } onClick={this.handleFocus} errors={''} />
+        <input data-validators={ this.props.validator ? this.props.validator : '' } type={ this.props.type ? this.props.type : 'text' }  className={`form-control ${this.props.class} ${ hasErrors ? 'form-control-danger' : ''}`} name={ this.props.name ? this.props.name : '' } id={ this.props.id ? this.props.id  : '' } placeholder={ this.props.title ? this.props.title : '' } onChange={ this.handleChange } onClick={this.handleFocus} errors={''} />
       </div>
     );
   }

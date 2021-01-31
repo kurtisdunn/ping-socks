@@ -6,3 +6,8 @@ $default_animation: all 100ms ease-in-out;
   transition: $default_animation;
 
 }
+
+.form-control.transparent-input{
+  color: #cac5bd;
+  background-color:rgba(0,0,0,0) !important;
+}

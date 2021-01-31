@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const webpack = require('webpack');
@@ -71,7 +72,8 @@ const Ping = require('./utils/ping')
 //TODO figure out a better way to pass IO to classes. 
 // single.ping();
 app.use(middleware(compiler));
-require('./routes')(app);
+require('./routes')(app, io);
+app.use(bodyParser.json());
 app.use(express.static(__dirname + './../dist'));
 
 // app.get('/', (req, res) => {

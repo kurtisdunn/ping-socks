@@ -12,7 +12,7 @@ module.exports =  class Ping{
     newConn(){
         const hosts = this.hosts;
         this.io.on("connection",function(client){
-            setInterval(() => {
+        const gobabaygo =  setInterval(() => {
                 hosts.forEach(function (host) {
                     ping.promise.probe(host)
                         .then(function (res) {
@@ -21,8 +21,9 @@ module.exports =  class Ping{
                         });
                 });
             }, 1000);
- 
+            gobabaygo()
             client.on("disconnect",function(){
+                clearInterval(gobabaygo);
                 console.log("client disconnected",client.id);
             });
         })
