@@ -72,9 +72,13 @@ const Ping = require('./utils/ping')
 //TODO figure out a better way to pass IO to classes. 
 // single.ping();
 app.use(middleware(compiler));
-require('./routes')(app, io);
+
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(bodyParser.json());
 app.use(express.static(__dirname + './../dist'));
+require('./routes')(app, io);
 
 // app.get('/', (req, res) => {
 //     res.sendFile(__dirname + '/dist/index.html');

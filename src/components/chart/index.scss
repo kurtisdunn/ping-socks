@@ -1,3 +1,63 @@
+
+	// red: 'rgb(255, 99, 132)',
+	// orange: 'rgb(255, 159, 64)',
+	// yellow: 'rgb(255, 205, 86)',
+	// green: 'rgb(75, 192, 192)',
+	// blue: 'rgb(54, 162, 235)',
+	// purple: 'rgb(153, 102, 255)',
+	// grey: 'rgb(201, 203, 207)'
+
+
+
 .form-label-group {
     padding:0
+}
+#badges{
+    min-height: 55px;
+    padding: 20px 15px;
+    cursor: pointer;
+
+    .badge-red{
+        background-color: rgb(255, 99, 132);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-orange{
+        background-color: rgb(255, 159, 64);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-yellow{
+        background-color: rgb(255, 205, 86);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-green{
+        background-color: rgb(75, 192, 192);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-blue{
+        background-color: rgb(54, 162, 235);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-purple{
+        background-color: rgb(153, 102, 255);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+    .badge-grey{
+        background-color: rgb(201, 203, 207);
+        &:hover{
+            filter: brightness(85%);
+        }
+    }
+
 }
