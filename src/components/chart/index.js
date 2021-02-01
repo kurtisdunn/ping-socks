@@ -24,31 +24,32 @@ var chartColors = {
 };
 
 var colorNames = Object.keys(chartColors);
+var color = Chart.helpers.color;
 
-
+function randomScalingFactor() {
+  return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
+}
 
 export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { }
+    this.state = {
+      data: []
+    }
   }
   static getDerivedStateFromProps(props, current_state) {
     console.log(props)
-    if (current_state.data !== props.data) {
-      return [{
-        id: props.id,
-        data: props.data
-      }]
-    }
+    // if (current_state.data !== props.data) {
+    //   return [{
+    //     id: props.id,
+    //     data: props.data
+    //   }]
+    // }
     return null
   }
   componentDidMount(){
     console.log('componentDidMount', this.state.data);
-
     const that = this;
-
-    var color = Chart.helpers.color;
-
     // const dataSet = (data) => {
     //   return Object.assign({}, {
     //     label: data.label,
@@ -63,6 +64,15 @@ export default class LineChart extends React.Component {
 
     // console.log(dataSet());  
 
+    function onRefresh(chart) {
+
+      chart.config.data.datasets.forEach(function(dataset) {
+        dataset.data.push({
+          x: Date.now(),
+          y: randomScalingFactor()
+        });
+      });
+    }
     var config = {
       type: 'line',
       data: {
@@ -81,19 +91,14 @@ export default class LineChart extends React.Component {
           fill: false,
           cubicInterpolationMode: 'monotone',
           data: []
-        }, {
-          label: 'Dataset 3 (cubic interpolation)',
-          backgroundColor: color(chartColors.green).alpha(0.5).rgbString(),
-          borderColor: chartColors.green,
-          fill: false,
-          cubicInterpolationMode: 'monotone',
-          data: this.props.data != null ? this.props.data.time : []
         }]
       },
       options: {
+        legend: {
+          display: false
+        },
         title: {
-          display: true,
-          text: 'Ping Times'
+          display: false
         },
         scales: {
           xAxes: [{
@@ -122,42 +127,29 @@ export default class LineChart extends React.Component {
         }
       }
     };
-
-    function randomScalingFactor() {
-	    return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
-    }
-
-    function onRefresh(chart) {
-
-      chart.config.data.datasets.forEach(function(dataset) {
-        dataset.data.push({
-          x: Date.now(),
-          y: that.state[0].data != null ? that.state[0].data.time : randomScalingFactor()
-        });
-      });
-    }
-
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
-    
-
+    const socket = io.connect();
+    socket.on("data",function(data){
+      // const messages = document.getElementById('messages');
+      console.log('socket.on("data"', data)
+      // that.props.data ={
+      //   time: data.time != null ? data.time : null
+      // }
+      // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
+    });
 
     document.getElementById('new').addEventListener('click', function() {
-      const input = $('#hostsInput').val()
-      console.log(input);
+      const input = $('#hostsInput').val();
       PingPost(input).then((res) => {
-        console.log(res);
+        // that.state.data.push(res);
+        that.setState({ data: [...that.state.data, res] })
+        // that.setState({'data': Object.assign({}, res)});
+        console.log(that.state);
       });
 
-      const socket = io.connect();
-      socket.on("data",function(data){
-        // const messages = document.getElementById('messages');
-        console.log('socket.on("data"', data)
-        this.props.data ={
-          time: data.time != null ? data.time : null
-        }
-        // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
-      });
+    
+
       // var colorName = colorNames[config.data.datasets.length % colorNames.length];
       // var newColor = chartColors[colorName];
       // var newDataset = {
@@ -215,13 +207,23 @@ export default class LineChart extends React.Component {
     
   }
   render() {
+    const data = this.state.data;
+    console.log('render', data.length > 0 ? data : null);
+
     return (
       <div>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
         <Input type="text" class="transparent-input" title="Hosts" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
         <Button class="btn-outline-secondary" type="button" id="new">Button</Button>
       </div>
-        <canvas id={this.props.id}></canvas>
+        <div id="badges">
+        {
+          data.length > 0  ? data.map((i, k) => 
+            <div className="badge rounded-pill badge-red" key={k}>{i.ping.hosts } &nbsp;<span aria-hidden="true">&times;</span></div>
+          ) : ''
+        }
+        </div>
+        <canvas id={ this.props.id }></canvas>
         <p className="text-center">
           {/* <button type="button" className="btn btn-outline-primary btn-sm" id="randomizeData">Randomize Data</button>
           <button type="button" className="btn btn-outline-primary btn-sm" id="addDataset">Add Dataset</button>
