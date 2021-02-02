@@ -5,7 +5,9 @@ import  Chart from 'chart.js';
 import 'chartjs-plugin-streaming';
 import io from 'socket.io-client';
 import $ from 'jquery';
-import PingPost from '../../api/ping/post'
+
+import PingPost from '../../api/ping/post';
+import PingDelete from '../../api/ping/delete'
 
 import Input from '../input';
 import Button from '../button';
@@ -36,20 +38,13 @@ export default class LineChart extends React.Component {
     this.state = {
       data: []
     }
+
   }
-  static getDerivedStateFromProps(props, current_state) {
-    console.log(props)
-    // if (current_state.data !== props.data) {
-    //   return [{
-    //     id: props.id,
-    //     data: props.data
-    //   }]
-    // }
-    return null
-  }
+ 
   componentDidMount(){
     console.log('componentDidMount', this.state.data);
     const that = this;
+    
     // const dataSet = (data) => {
     //   return Object.assign({}, {
     //     label: data.label,
@@ -65,7 +60,6 @@ export default class LineChart extends React.Component {
     // console.log(dataSet());  
 
     function onRefresh(chart) {
-
       chart.config.data.datasets.forEach(function(dataset) {
         dataset.data.push({
           x: Date.now(),
@@ -130,39 +124,46 @@ export default class LineChart extends React.Component {
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
     const socket = io.connect();
-    socket.on("data",function(data){
-      // const messages = document.getElementById('messages');
-      console.log('socket.on("data"', data)
-      // that.props.data ={
-      //   time: data.time != null ? data.time : null
-      // }
-      // $('#messages').append(`<ul>${data.host.toString()}</ul>`);
+    socket.on('connect', function() {
+      console.log("Successfully connected!");
+
     });
 
+
+
+
     document.getElementById('new').addEventListener('click', function() {
-      const input = $('#hostsInput').val();
-      PingPost(input).then((res) => {
-        // that.state.data.push(res);
-        that.setState({ data: [...that.state.data, res] })
-        // that.setState({'data': Object.assign({}, res)});
-        console.log(that.state);
+    const input = $('#hostsInput').val();
+    
+    PingPost(input).then((res) => {
+      socket.on(res.ping.hosts ,function(data){
+        console.log(`${res.ping.hosts}`, data)
+        that.setState({pings: Object.assign({}, data)});
+        console.log( that.state.pings.time.time);
+              var colorName = colorNames[config.data.datasets.length % colorNames.length];
+              var newColor = chartColors[colorName];
+              var newDataset = {
+                label: 'Dataset ' + (config.data.datasets.length + 1),
+                
+                backgroundColor: color(newColor).alpha(0.5).rgbString(),
+                borderColor: newColor,
+                fill: false,
+                lineTension: 0,
+                data: [{
+                  x: Date.now(),
+                  y: that.state.pings.time.time
+                }]
+              };
+              config.data.datasets.push(newDataset);
+              window.myChart.update();
       });
+      that.setState({ data: [...that.state.data, res] });
+      console.log(that.state);
+    });
 
     
 
-      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
-      // var newColor = chartColors[colorName];
-      // var newDataset = {
-      //   label: 'Dataset ' + (config.data.datasets.length + 1),
-        
-      //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
-      //   borderColor: newColor,
-      //   fill: false,
-      //   lineTension: 0,
-      //   data: []
-      // };
-      // config.data.datasets.push(newDataset);
-      // window.myChart.update();
+
     });
 
 
@@ -206,9 +207,16 @@ export default class LineChart extends React.Component {
     
     
   }
+  remove(i){
+    console.log(i);
+    PingDelete().then(r =>{
+
+    });
+  }
   render() {
     const data = this.state.data;
-    console.log('render', data.length > 0 ? data : null);
+    const killping = this.killping;
+    console.log('render', this.state);
 
     return (
       <div>
@@ -219,7 +227,7 @@ export default class LineChart extends React.Component {
         <div id="badges">
         {
           data.length > 0  ? data.map((i, k) => 
-            <div className="badge rounded-pill badge-red" key={k}>{i.ping.hosts } &nbsp;<span aria-hidden="true">&times;</span></div>
+            <div className="badge rounded-pill badge-red" key={k} id={i.ping.id} onClick={ killping }>{i.ping.hosts } &nbsp;&times;</div>
           ) : ''
         }
         </div>

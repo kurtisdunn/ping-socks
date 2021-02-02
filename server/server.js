@@ -72,7 +72,6 @@ const Ping = require('./utils/ping')
 //TODO figure out a better way to pass IO to classes. 
 // single.ping();
 app.use(middleware(compiler));
-
 app.use(bodyParser.urlencoded({
   extended: true
 }));
@@ -87,7 +86,3 @@ require('./routes')(app, io);
 http.listen(8080, () => {
   console.log('listening on *:8080');
 });
-
-
-
-
