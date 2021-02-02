@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 import LineChart from '../../components/chart'
 
-const socket = io.connect();
+// const socket = io.connect();
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -14,9 +14,9 @@ export default class Home extends React.Component {
   }
   componentDidMount(){
     const that = this;
-    socket.on("data",function(data){
-      that.setState({'data': data});
-    })
+    // socket.on("data",function(data){
+    //   that.setState({'data': data});
+    // })
   }
   render() {
     return (

@@ -5,32 +5,36 @@ module.exports =  class Ping{
         this.io = io;
         this.guid = guid;
         this.hosts = hosts;
+        this.startPing = undefined;
         hosts != null ? this.newConn(hosts) : null;
     }
     getguid(){
         return this.guid;
     }
+    terminate(){
+        clearInterval(this.startPing);
+        console.log("client disconnected: ",client.id);
+    }
     newConn(){
+        const that = this;
         const hosts = this.hosts;
-        console.log('this', this.guid);
-        this.io.on("connection",function(client){
-        const gobabaygo =  setInterval(() => {
-            hosts.forEach(function (host) {
-                ping.promise.probe(host)
-                    .then(function (res) {
-                        // console.log(res);
-                        client.emit("data", host)
-                    });
+        const io = this.io;
+        const startPing =  setInterval(() => { 
+            ping.promise.probe(hosts).then(res => { 
+                console.log(res);
+                res.host === 'unknown' ? this.terminate : io.emit(res.host, { time: res }); 
             });
-        }, 1000);
-        
-        gobabaygo;
-
-
+        }, 1000)
+        // startPing = this.startPing;
+        this.startPing = startPing;
+        io.on('connect' ,function(client){
+            console.log('comm');
             client.on("disconnect",function(){
-                clearInterval(gobabaygo);
-                console.log("client disconnected",client.id);
+                console.log('connectdiss');
+                clearInterval(startPing);
+                this.terminate();
+                console.log("client disconnected: ",client.id);
             });
-        })
+        });
     }
 } 
