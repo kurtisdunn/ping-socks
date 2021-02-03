@@ -10,8 +10,12 @@ module.exports = function(app, io){
 
     // New Ping!
     app.post('/api/ping', function(req, res){
+
         const ping = new Ping(io, Guid(), req.body.data);
         pings.push(ping)
+        const current = pings.filter(r => r.host === 'google.com');
+        console.log('current', current);
+
         res.status(200).json({
             "ping": {
                 "id": ping.getguid(), 
@@ -26,6 +30,8 @@ module.exports = function(app, io){
     });
     
     app.delete('/api/ping', (req, res) => {
-        console.log(req);
+        console.log(req.body);
+        const ping = pings.filter(r => r.guid === req.body.id);
+        ping[0].terminatePing();
     })
 }

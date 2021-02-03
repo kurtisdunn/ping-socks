@@ -1,7 +1,7 @@
 import fetch from '../../utils/fetch';
 
 export default function (data) {
-  return fetch('/api/ping', {
+  return fetch('/ping', {
     method: 'delete',
     headers: {
       'Content-Type': 'application/json'

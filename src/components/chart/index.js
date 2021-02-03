@@ -44,20 +44,6 @@ export default class LineChart extends React.Component {
   componentDidMount(){
     console.log('componentDidMount', this.state.data);
     const that = this;
-    
-    // const dataSet = (data) => {
-    //   return Object.assign({}, {
-    //     label: data.label,
-    //     backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
-    //     borderColor: chartColors.red,
-    //     fill: false,
-    //     lineTension: 0,
-    //     borderDash: [8, 4],
-    //     data: []
-    //   })
-    // }
-
-    // console.log(dataSet());  
 
     function onRefresh(chart) {
       chart.config.data.datasets.forEach(function(dataset) {
@@ -70,22 +56,7 @@ export default class LineChart extends React.Component {
     var config = {
       type: 'line',
       data: {
-        datasets: [{
-          label: 'Dataset 1 (linear interpolation)',
-          backgroundColor: color(chartColors.red).alpha(0.5).rgbString(),
-          borderColor: chartColors.red,
-          fill: false,
-          lineTension: 0,
-          borderDash: [8, 4],
-          data: []
-        }, {
-          label: 'Dataset 2 (cubic interpolation)',
-          backgroundColor: color(chartColors.blue).alpha(0.5).rgbString(),
-          borderColor: chartColors.blue,
-          fill: false,
-          cubicInterpolationMode: 'monotone',
-          data: []
-        }]
+        datasets: []
       },
       options: {
         legend: {
@@ -124,6 +95,7 @@ export default class LineChart extends React.Component {
     var ctx = document.getElementById(this.props.id).getContext('2d');
     window.myChart = new Chart(ctx, config);
     const socket = io.connect();
+
     socket.on('connect', function() {
       console.log("Successfully connected!");
 
@@ -136,29 +108,32 @@ export default class LineChart extends React.Component {
     const input = $('#hostsInput').val();
     
     PingPost(input).then((res) => {
-      socket.on(res.ping.hosts ,function(data){
-        console.log(`${res.ping.hosts}`, data)
-        that.setState({pings: Object.assign({}, data)});
-        console.log( that.state.pings.time.time);
-              var colorName = colorNames[config.data.datasets.length % colorNames.length];
-              var newColor = chartColors[colorName];
-              var newDataset = {
-                label: 'Dataset ' + (config.data.datasets.length + 1),
-                
-                backgroundColor: color(newColor).alpha(0.5).rgbString(),
-                borderColor: newColor,
-                fill: false,
-                lineTension: 0,
-                data: [{
-                  x: Date.now(),
-                  y: that.state.pings.time.time
-                }]
-              };
-              config.data.datasets.push(newDataset);
-              window.myChart.update();
-      });
       that.setState({ data: [...that.state.data, res] });
-      console.log(that.state);
+
+      // socket.on(res.ping.hosts ,function(data){
+      //   console.log(`${res.ping.hosts}`, data)
+      //   that.setState({pings: Object.assign({}, data)});
+      //   console.log( that.state.pings.time.time);
+
+      // });
+      
+      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
+      // var newColor = chartColors[colorName];
+      // var newDataset = {
+      //   label: 'Dataset ' + (config.data.datasets.length + 1),
+        
+      //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
+      //   borderColor: newColor,
+      //   fill: false,
+      //   lineTension: 0,
+      //   data: [{
+      //     x: Date.now(),
+      //     y: that.state.pings ? that.state.pings.time.time : null
+      //   }]
+      // };
+      // config.data.datasets.push(newDataset);
+      // window.myChart.update();
+      // console.log(that.state);
     });
 
     
@@ -208,26 +183,26 @@ export default class LineChart extends React.Component {
     
   }
   remove(i){
-    console.log(i);
-    PingDelete().then(r =>{
-
+    console.log(i.target.id);
+    PingDelete(i.target.id).then(r =>{
+      // Remove dataset from graph
     });
   }
   render() {
     const data = this.state.data;
-    const killping = this.killping;
+    const remove = this.remove;
     console.log('render', this.state);
 
     return (
       <div>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
-        <Input type="text" class="transparent-input" title="Hosts" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
-        <Button class="btn-outline-secondary" type="button" id="new">Button</Button>
+        <Input type="text" class="transparent-input" title="Enter the target" aria-label="Hosts" aria-describedby="new" id="hostsInput" />
+        <Button class="btn-outline-secondary" type="button" title="Start" id="new"></Button>
       </div>
         <div id="badges">
         {
           data.length > 0  ? data.map((i, k) => 
-            <div className="badge rounded-pill badge-red" key={k} id={i.ping.id} onClick={ killping }>{i.ping.hosts } &nbsp;&times;</div>
+            <div className="badge rounded-pill badge-red" key={k} id={i.ping.id} onClick={ remove }> {i.ping.hosts } &nbsp;&times;</div>
           ) : ''
         }
         </div>
