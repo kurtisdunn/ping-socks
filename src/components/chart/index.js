@@ -96,12 +96,10 @@ export default class LineChart extends React.Component {
     window.myChart = new Chart(ctx, config);
     const socket = io.connect();
 
-    socket.on('connect', function() {
-      console.log("Successfully connected!");
-
-    });
-
-
+    // let sock;
+    // socket.on('connect' ,function(data){
+    //   console.log("Successfully connected!");
+    // });
 
 
     document.getElementById('new').addEventListener('click', function() {
@@ -110,12 +108,13 @@ export default class LineChart extends React.Component {
     PingPost(input).then((res) => {
       that.setState({ data: [...that.state.data, res] });
 
-      // socket.on(res.ping.hosts ,function(data){
-      //   console.log(`${res.ping.hosts}`, data)
-      //   that.setState({pings: Object.assign({}, data)});
-      //   console.log( that.state.pings.time.time);
+      socket.on('connect' ,function(data){
+        console.log("Successfully connected!");
+        console.log(`${res.ping.hosts}`, data)
+        that.setState({pings: Object.assign({}, data)});
+        console.log( that.state.pings.time.time);
 
-      // });
+      });
       
       // var colorName = colorNames[config.data.datasets.length % colorNames.length];
       // var newColor = chartColors[colorName];

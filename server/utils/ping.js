@@ -1,16 +1,16 @@
 const ping = require('ping');
 
 module.exports =  class Ping{
-    constructor(io, guid, host){
-        this.io = io;
+    constructor(sock, guid, host){
+        this.sock = sock;
         this.guid = guid;
         this.host = host;
         this.runningPing = null;
         this.terminatePing = this.terminatePing;
         //Kick off the sequence. 
         if(host != null){
-            this.socket(); 
-            this.startPing(host);
+           
+            this.socket(host);
         }
 
     }
@@ -23,7 +23,7 @@ module.exports =  class Ping{
         const runningPing = setInterval(() => { 
             ping.promise.probe(host).then(res => { 
                 console.log(res.host, res.time);
-                res.host === 'unknown' ? this.terminate : that.io.emit(res.host, res); 
+                res.host === 'unknown' ? this.terminatePing : that.sock.broadcast.emit(res); 
             });
         }, 1000)
         this.runningPing = runningPing;
@@ -34,11 +34,12 @@ module.exports =  class Ping{
     }
     socket(){
         const that = this;
-        this.io.on('connect' ,function(client){
-            client.on("disconnect",function(){
-                console.log("client disconnected: ",client.id);
+
+            that.startPing(); 
+           this.sock.on("disconnect",function(){
+                console.log("client disconnected sdfsdafdsa: ", that.sock.id);
+                clearInterval(that.runningPing);
                 that.terminatePing();
             });
-        });
     }
 } 
