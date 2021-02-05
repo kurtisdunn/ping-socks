@@ -130,7 +130,7 @@ export default class LineChart extends React.Component {
           config.data.datasets.push(newDataset);
           window.myChart.update();
           that.forceUpdate()
-        }, 1000);
+        }, 500);
       });
     });
     
@@ -155,7 +155,7 @@ export default class LineChart extends React.Component {
       </div>
         <div id="badges">
         {
-          data.length > 0 ? (data[0].color ? data.map((i, k) => <div className="badge rounded-pill" style={{ background: `'${i.color}'` }} key={k} id={i.id} onClick={ (i) => remove(i, that) }> {i.hosts } &nbsp;&times;</div> ) : '' ) : ''
+          data.length > 0 ? (data[0].color ? data.map((i, k) => <div className="badge rounded-pill" style={{ background: i.color ? i.color : ''  }} key={k} id={i.id} onClick={ (i) => remove(i, that) }> {i.hosts } &nbsp;&times;</div> ) : '' ) : ''
         }
         </div>
         <canvas id={ this.props.id }></canvas>
