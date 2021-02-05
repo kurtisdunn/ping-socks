@@ -8,10 +8,10 @@ let sock;
 
 module.exports = function(app, io){
         io.on('connection', function(client){
-            console.log('connected');
+            // console.log('connected');
             sock = client;
             client.on("disconnect",function(){
-                console.log("client disconnected: ", client.id);
+                // console.log("client disconnected: ", client.id);
                 pings = [];
             });
         });
@@ -28,11 +28,9 @@ module.exports = function(app, io){
         pings.push(ping)
         const current = pings.filter(r => r.host === 'google.com');
         res.status(200).json({
-            "ping": {
                 "id": ping.getguid(), 
                 "hosts": req.body.data
-            }
-        });
+            });
     });
     
     // Update Ping
@@ -41,8 +39,12 @@ module.exports = function(app, io){
     });
     
     app.delete('/api/ping', (req, res) => {
-        console.log(req.body);
         const ping = pings.filter(r => r.guid === req.body.id);
+        const newPings = pings.filter(r => r.guid != req.body.id);
         ping[0].terminatePing();
+        pings = newPings;
+        res.status(200).json({
+            "pings": newPings.length
+        });
     })
 }

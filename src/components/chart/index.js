@@ -12,9 +12,6 @@ import PingDelete from '../../api/ping/delete'
 import Input from '../input';
 import Button from '../button';
 
-//TODO Duntion to add create a data set
-//TODO componentDidUnmount remove event listners.
-
 var chartColors = {
 	red: 'rgb(255, 99, 132)',
 	orange: 'rgb(255, 159, 64)',
@@ -31,7 +28,8 @@ var color = Chart.helpers.color;
 function randomScalingFactor() {
   return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
 }
-
+      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
+      // var newColor = chartColors[colorName];
 export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
@@ -44,15 +42,18 @@ export default class LineChart extends React.Component {
   componentDidMount(){
     console.log('componentDidMount', this.state.data);
     const that = this;
+      var colorName = colorNames[this.state.data.length % colorNames.length];
+      var newColor = chartColors[colorName];
 
     function onRefresh(chart) {
       chart.config.data.datasets.forEach(function(dataset) {
         dataset.data.push({
           x: Date.now(),
-          y: randomScalingFactor()
+          y: that.state.data.length > 0 ? that.state.data[0].ping.time : null
         });
       });
     }
+ 
     var config = {
       type: 'line',
       data: {
@@ -78,7 +79,7 @@ export default class LineChart extends React.Component {
           yAxes: [{
             scaleLabel: {
               display: true,
-              labelString: 'value'
+              labelString: 'Time ms'
             }
           }]
         },
@@ -108,87 +109,47 @@ export default class LineChart extends React.Component {
     
     PingPost(input).then((res) => {
       that.setState({ data: [...that.state.data, res] });
-
-      socket.on(input ,function(data){
-        console.log("Successfully connected!", sock);
-        console.log(`${res.ping.hosts}`, data)
-        that.setState({pings: Object.assign({}, data)});
-        console.log( that.state.pings.time.time);
-
+      const data = that.state.data;
+      // let dat = Object.assign(data.filter(r => r.id === res.id, {}, data) );
+      socket.on(input ,function(i){
+        const dat = Object.assign({}, that.state.data.filter(r => r.id === res.id)[0], { ping: i });
+        const newdata = that.state.data[that.state.data.findIndex(el => el.id === res.id)] = dat;
       });
-      
-      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
-      // var newColor = chartColors[colorName];
-      // var newDataset = {
-      //   label: 'Dataset ' + (config.data.datasets.length + 1),
-        
-      //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
-      //   borderColor: newColor,
-      //   fill: false,
-      //   lineTension: 0,
-      //   data: [{
-      //     x: Date.now(),
-      //     y: that.state.pings ? that.state.pings.time.time : null
-      //   }]
-      // };
-      // config.data.datasets.push(newDataset);
-      // window.myChart.update();
+      console.log(that.state.data[0]);
+      var colorName = colorNames[that.state.data.length % colorNames.length];
+      var newColor = chartColors[colorName];
+      var newDataset = {
+        label: 'Dataset ' + (config.data.datasets.length + 1),
+        backgroundColor: color(newColor).alpha(0.5).rgbString(),
+        borderColor: newColor,
+        fill: false,
+        lineTension: 0,
+        data: [{
+          x: Date.now(),
+          y: that.state.data.length > 0 ? that.state.data[0].ping.time : null
+        }]
+      };
+      config.data.datasets.push(newDataset);
+      window.myChart.update();
       // console.log(that.state);
     });
-
-    
-
-
     });
-
-
-
-    // document.getElementById('addDataset').addEventListener('click', function() {
-
-    //   PingPost(hosts)
-    //   // var colorName = colorNames[config.data.datasets.length % colorNames.length];
-    //   // var newColor = chartColors[colorName];
-    //   // var newDataset = {
-    //   //   label: 'Dataset ' + (config.data.datasets.length + 1),
-        
-    //   //   backgroundColor: color(newColor).alpha(0.5).rgbString(),
-    //   //   borderColor: newColor,
-    //   //   fill: false,
-    //   //   lineTension: 0,
-    //   //   data: []
-    //   // };
-    //   // config.data.datasets.push(newDataset);
-    //   // window.myChart.update();
-    // });
-    
-    // document.getElementById('removeDataset').addEventListener('click', function() {
-    //   config.data.datasets.pop();
-    //   window.myChart.update();
-    // });
-    
-    // document.getElementById('addData').addEventListener('click', function() {
-    //   onRefresh(window.myChart);
-    //   window.myChart.update();
-    // });
-
-    // document.getElementById('randomizeData').addEventListener('click', () => {
-    //     config.data.datasets.forEach(function (dataset) {
-    //       dataset.data.forEach(function (dataObj) {
-    //         dataObj.y = randomScalingFactor();
-    //       });
-    //     });
-    //     window.myChart.update();
-    //   });
     
     
   }
-  remove(i){
-    console.log(i.target.id);
-    PingDelete(i.target.id).then(r =>{
-      // Remove dataset from graph
+  remove(i, that){
+    // const that = this;
+    PingDelete(i.target.id).then(r => {
+      console.log('r', r);
+      // console.log('r', that.state);
+      const data = that.state.data.filter(r => r.id != i.target.id);
+      console.log(data);
+      that.setState({ data : data });
+      //function(el) { return el.Name != "Kristian"; }); 
     });
   }
   render() {
+    const that = this;
     const data = this.state.data;
     const remove = this.remove;
     console.log('render', this.state);
@@ -202,17 +163,11 @@ export default class LineChart extends React.Component {
         <div id="badges">
         {
           data.length > 0  ? data.map((i, k) => 
-            <div className="badge rounded-pill badge-red" key={k} id={i.ping.id} onClick={ remove }> {i.ping.hosts } &nbsp;&times;</div>
+            <div className="badge rounded-pill badge-red" key={k} id={i.id} onClick={ (i) => remove(i, that) }> {i.hosts } &nbsp;&times;</div>
           ) : ''
         }
         </div>
         <canvas id={ this.props.id }></canvas>
-        <p className="text-center">
-          {/* <button type="button" className="btn btn-outline-primary btn-sm" id="randomizeData">Randomize Data</button>
-          <button type="button" className="btn btn-outline-primary btn-sm" id="addDataset">Add Dataset</button>
-          <button type="button" className="btn btn-outline-primary btn-sm" id="removeDataset">Remove Dataset</button>
-          <button type="button" className="btn btn-outline-primary btn-sm" id="addData">Add Data</button> */}
-        </p>
       </div>
     );
   }
