@@ -22,7 +22,7 @@ module.exports = class Ping {
         const host = this.host;
         const runningPing = setInterval(() => {
             ping.promise.probe(host).then(res => {
-                console.log(res.host, res.time);
+                // console.log(res.host, res.time);
                 res.host === 'unknown' ? this.terminatePing : that.io.emit(host, res);
             });
         }, 1000)
