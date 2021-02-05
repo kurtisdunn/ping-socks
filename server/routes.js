@@ -24,7 +24,7 @@ module.exports = function(app, io){
     // New Ping!
     app.post('/api/ping', function(req, res){
 
-        const ping = new Ping(sock, Guid(), req.body.data);
+        const ping = new Ping(io, sock, Guid(), req.body.data);
         pings.push(ping)
         const current = pings.filter(r => r.host === 'google.com');
         res.status(200).json({

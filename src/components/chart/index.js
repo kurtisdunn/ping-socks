@@ -96,10 +96,11 @@ export default class LineChart extends React.Component {
     window.myChart = new Chart(ctx, config);
     const socket = io.connect();
 
-    // let sock;
-    // socket.on('connect' ,function(data){
-    //   console.log("Successfully connected!");
-    // });
+    let sock;
+    socket.on('connect' ,function(data){
+      data = sock;
+      console.log("connect, Successfully connected!");
+    });
 
 
     document.getElementById('new').addEventListener('click', function() {
@@ -108,8 +109,8 @@ export default class LineChart extends React.Component {
     PingPost(input).then((res) => {
       that.setState({ data: [...that.state.data, res] });
 
-      socket.on('connect' ,function(data){
-        console.log("Successfully connected!");
+      socket.on(input ,function(data){
+        console.log("Successfully connected!", sock);
         console.log(`${res.ping.hosts}`, data)
         that.setState({pings: Object.assign({}, data)});
         console.log( that.state.pings.time.time);
