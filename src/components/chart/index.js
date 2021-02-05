@@ -22,34 +22,30 @@ var chartColors = {
 	grey: 'rgb(201, 203, 207)'
 };
 
-var colorNames = Object.keys(chartColors);
-var color = Chart.helpers.color;
 
-function randomScalingFactor() {
-  return (Math.random() > 0.5 ? 1.0 : -1.0) * Math.round(Math.random() * 100);
-}
-      // var colorName = colorNames[config.data.datasets.length % colorNames.length];
-      // var newColor = chartColors[colorName];
+
+
 export default class LineChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       data: []
     }
-
   }
  
   componentDidMount(){
     console.log('componentDidMount', this.state.data);
     const that = this;
-      var colorName = colorNames[this.state.data.length % colorNames.length];
-      var newColor = chartColors[colorName];
+    var colorNames = Object.keys(chartColors);
+    var color = Chart.helpers.color;
+    var colorName = colorNames[this.state.data.length % colorNames.length];
+    var newColor = chartColors[colorName];
 
     function onRefresh(chart) {
       chart.config.data.datasets.forEach(function(dataset) {
         dataset.data.push({
           x: Date.now(),
-          y: that.state.data.length > 0 ? that.state.data[0].ping.time : null
+          y: that.state.data[0].ping ? that.state.data.filter(r => r.hosts === dataset.label)[0].ping.time : null
         });
       });
     }
@@ -70,9 +66,9 @@ export default class LineChart extends React.Component {
           xAxes: [{
             type: 'realtime',
             realtime: {
-              duration: 20000,
+              duration: 50000,
               refresh: 1000,
-              delay: 2000,
+              delay: 1000,
               onRefresh: onRefresh
             }
           }],
@@ -97,63 +93,60 @@ export default class LineChart extends React.Component {
     window.myChart = new Chart(ctx, config);
     const socket = io.connect();
 
-    let sock;
-    socket.on('connect' ,function(data){
-      data = sock;
-      console.log("connect, Successfully connected!");
-    });
-
+    socket.on('disconnect', function(){
+      config.data.datasets = [];
+      window.myChart.update();
+      that.setState({ data: [] })
+    })
 
     document.getElementById('new').addEventListener('click', function() {
-    const input = $('#hostsInput').val();
-    
-    PingPost(input).then((res) => {
-      that.setState({ data: [...that.state.data, res] });
-      const data = that.state.data;
-      // let dat = Object.assign(data.filter(r => r.id === res.id, {}, data) );
-      socket.on(input ,function(i){
-        const dat = Object.assign({}, that.state.data.filter(r => r.id === res.id)[0], { ping: i });
-        const newdata = that.state.data[that.state.data.findIndex(el => el.id === res.id)] = dat;
+      const input = $('#hostsInput').val();
+      PingPost(input).then((res) => {
+        that.setState({ data: [...that.state.data, res] });
+
+        var colorName = colorNames[that.state.data.length % colorNames.length];
+        var newColor = chartColors[colorName];
+        const setcolour = Object.assign({}, that.state.data.filter(r => r.id === res.id)[0], { color: newColor });
+       
+        that.state.data[that.state.data.findIndex(el => el.id === res.id)] = setcolour;
+        socket.on(input ,function(i){
+          const dat = Object.assign({}, that.state.data.filter(r => r.id === res.id)[0], { ping: i });
+          const newdata = that.state.data[that.state.data.findIndex(el => el.id === res.id)] = dat;
+        });
+
+
+        var newDataset = {
+          label: input,
+          backgroundColor: color(newColor).alpha(0.5).rgbString(),
+          borderColor: newColor,
+          fill: false,
+          lineTension: 0,
+          data: [{
+            x: Date.now(),
+            y: that.state.data.filter(r => r.id === res.id)[0].ping ? that.state.data.filter(r => r.id === res.id)[0].ping.time : null
+          }]
+        };
+        setTimeout(() => {
+          config.data.datasets.push(newDataset);
+          window.myChart.update();
+          that.forceUpdate()
+        }, 1000);
       });
-      console.log(that.state.data[0]);
-      var colorName = colorNames[that.state.data.length % colorNames.length];
-      var newColor = chartColors[colorName];
-      var newDataset = {
-        label: 'Dataset ' + (config.data.datasets.length + 1),
-        backgroundColor: color(newColor).alpha(0.5).rgbString(),
-        borderColor: newColor,
-        fill: false,
-        lineTension: 0,
-        data: [{
-          x: Date.now(),
-          y: that.state.data.length > 0 ? that.state.data[0].ping.time : null
-        }]
-      };
-      config.data.datasets.push(newDataset);
-      window.myChart.update();
-      // console.log(that.state);
-    });
     });
     
     
   }
   remove(i, that){
-    // const that = this;
     PingDelete(i.target.id).then(r => {
-      console.log('r', r);
-      // console.log('r', that.state);
       const data = that.state.data.filter(r => r.id != i.target.id);
-      console.log(data);
       that.setState({ data : data });
-      //function(el) { return el.Name != "Kristian"; }); 
     });
   }
   render() {
     const that = this;
     const data = this.state.data;
     const remove = this.remove;
-    console.log('render', this.state);
-
+    console.log(data);
     return (
       <div>
       <div className="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -162,9 +155,7 @@ export default class LineChart extends React.Component {
       </div>
         <div id="badges">
         {
-          data.length > 0  ? data.map((i, k) => 
-            <div className="badge rounded-pill badge-red" key={k} id={i.id} onClick={ (i) => remove(i, that) }> {i.hosts } &nbsp;&times;</div>
-          ) : ''
+          data.length > 0 ? (data[0].color ? data.map((i, k) => <div className="badge rounded-pill" style={{ background: `'${i.color}'` }} key={k} id={i.id} onClick={ (i) => remove(i, that) }> {i.hosts } &nbsp;&times;</div> ) : '' ) : ''
         }
         </div>
         <canvas id={ this.props.id }></canvas>
