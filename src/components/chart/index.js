@@ -22,10 +22,7 @@ var chartColors = {
 	grey: 'rgb(201, 203, 207)'
 };
 
-
-
-
-export default class LineChart extends React.Component {
+export default class DefaultChart extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,7 +47,7 @@ export default class LineChart extends React.Component {
       });
     }
  
-    var config = {
+    var config = that.config = {
       type: 'line',
       data: {
         datasets: []
@@ -126,6 +123,7 @@ export default class LineChart extends React.Component {
             y: that.state.data.filter(r => r.id === res.id)[0].ping ? that.state.data.filter(r => r.id === res.id)[0].ping.time : null
           }]
         };
+        console.log(newDataset);
         setTimeout(() => {
           config.data.datasets.push(newDataset);
           window.myChart.update();
@@ -140,6 +138,7 @@ export default class LineChart extends React.Component {
     PingDelete(i.target.id).then(r => {
       const data = that.state.data.filter(r => r.id != i.target.id);
       that.setState({ data : data });
+      that.config
     });
   }
   render() {

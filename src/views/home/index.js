@@ -1,7 +1,8 @@
 import './index.scss';
 import React from 'react';
 
-import LineChart from '../../components/chart'
+import DefaultChart from '../../components/chart'
+import LineChart from '../../components/chart/lineChart'
 
 export default class Home extends React.Component {
   constructor(props) {
@@ -11,7 +12,13 @@ export default class Home extends React.Component {
   render() {
     return (
         <div className="container">
-          <LineChart id="ping1"  data={ this.state != null ? this.state.data : null  }></LineChart>
+          <br />
+          <LineChart id="ping2"></LineChart>
+          <br />
+          < hr />
+          <br /> 
+          {/* <DefaultChart id="ping1"></DefaultChart> */}
+
           <ul id="messages"></ul>
         </div>
     );
