@@ -1,40 +1,44 @@
 const ping = require('ping');
 
-module.exports =  class Ping{
-    constructor(io, guid, hosts){
+module.exports = class Ping {
+    constructor(io, sock, guid, host) {
         this.io = io;
+        this.sock = sock;
         this.guid = guid;
-        this.hosts = hosts;
-        this.startPing = undefined;
-        hosts != null ? this.newConn(hosts) : null;
+        this.host = host;
+        this.runningPing = null;
+        this.terminatePing = this.terminatePing;
+        //Kick off the sequence. 
+        if (host != null) {
+            this.socket(host);
+        }
+
     }
-    getguid(){
+    getguid() {
         return this.guid;
     }
-    terminate(){
-        clearInterval(this.startPing);
-        console.log("client disconnected: ",client.id);
-    }
-    newConn(){
+    startPing() {
         const that = this;
-        const hosts = this.hosts;
-        const io = this.io;
-        const startPing =  setInterval(() => { 
-            ping.promise.probe(hosts).then(res => { 
-                console.log(res);
-                res.host === 'unknown' ? this.terminate : io.emit(res.host, { time: res }); 
+        const host = this.host;
+        const runningPing = setInterval(() => {
+            ping.promise.probe(host).then(res => {
+                // console.log(res.host, res.time);
+                res.host === 'unknown' ? this.terminatePing : that.io.emit(host, res);
             });
         }, 1000)
-        // startPing = this.startPing;
-        this.startPing = startPing;
-        io.on('connect' ,function(client){
-            console.log('comm');
-            client.on("disconnect",function(){
-                console.log('connectdiss');
-                clearInterval(startPing);
-                this.terminate();
-                console.log("client disconnected: ",client.id);
-            });
+        this.runningPing = runningPing;
+    }
+    terminatePing() {
+        console.log("terminate");
+        this.runningPing ? clearInterval(this.runningPing) : null;
+    }
+    socket() {
+        const that = this;
+        that.startPing();
+        this.sock.on("disconnect", function () {
+            // console.log("client disconnected sdfsdafdsa: ", that.sock.id);
+            clearInterval(that.runningPing);
+            that.terminatePing();
         });
     }
-} 
+}
