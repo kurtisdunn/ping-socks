@@ -31,6 +31,7 @@ module.exports = class Ping {
     terminatePing() {
         console.log("terminate");
         this.runningPing ? clearInterval(this.runningPing) : null;
+        this.sock.disconnect();
     }
     socket() {
         const that = this;
