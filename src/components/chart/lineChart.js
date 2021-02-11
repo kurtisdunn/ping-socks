@@ -21,17 +21,14 @@ export default class LineChart extends React.Component {
     constructor(props) {
         super(props);
         console.log('LineChart extends React.Component: ', props);
-        this.state = {
-            data: [],
-            dataSets: []
-        };
+        this.state = {};
     }
     static getDerivedStateFromProps(props, current_state) {
         console.log(props)
         if (current_state.data !== props.data) {
-          return [{
+          return {
             data: props.data,
-          }]
+          }
         }
         return null
     }
