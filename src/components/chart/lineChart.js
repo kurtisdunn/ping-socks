@@ -2,40 +2,35 @@ import './index.scss';
 import React from 'react';
 import { Chart, Line } from 'react-chartjs-2';
 import 'chartjs-plugin-streaming';
+import $ from 'jquery';
 
-const chartColors = {
-	red: 'rgb(255, 99, 132)',
-    blue: 'rgb(54, 162, 235)',
-    green: 'rgb(75, 192, 192)',
-	orange: 'rgb(255, 159, 64)',
-    grey: 'rgb(201, 203, 207)',
-	yellow: 'rgb(255, 205, 86)',
-	purple: 'rgb(153, 102, 255)'
-
-};
-
-let colorNames = Object.keys(chartColors);
-const color = Chart.helpers.color;
+let elem;
 
 export default class LineChart extends React.Component {
     constructor(props) {
         super(props);
         console.log('LineChart extends React.Component: ', props);
-        this.state = {};
+        this.state = {
+            data: []
+        };
+        var handleToUpdate  =   this.props.handleToUpdate
+        elem = this;
     }
     static getDerivedStateFromProps(props, current_state) {
-        console.log(props)
+        // console.log('LineChart.getDerivedStateFromProps', props)
         if (current_state.data !== props.data) {
           return {
             data: props.data,
+            dataSets: props.dataSets
           }
         }
-        return null
+        return null;
     }
- 
     addDataSet(res, that, newColor){
+        console.log('LineChart.addDataSet');
+        const color = Chart.helpers.color;
         const input = $('#hostsInput').val();
-        var newDataset = {
+        const newDataset = {
             label: input,
             backgroundColor: color(newColor).alpha(0.5).rgbString(),
             borderColor: newColor,
@@ -46,51 +41,32 @@ export default class LineChart extends React.Component {
                 y: that.state.data.filter(r => r.id === res.id)[0].ping ? that.state.data.filter(r => r.id === res.id)[0].ping.time : null
             }]
         };
+        // this.props.addDataSet(newDataset)
         that.setState({ dataSets: [...that.state.dataSets, newDataset] });
     }
-    // addPing(i, that){
-    //     const socket = that.socket;
-    //     const input = $('#hostsInput').val();
-    //     var colorName = colorNames[that.state.data.length % colorNames.length];
-    //     var newColor = chartColors[colorName];
-    //     let result;
-    //     PingPost(input).then((res) => {
-    //         result = res;
-    //         that.setState({ data: [...that.state.data, {
-    //             host: res.hosts,
-    //             id: res.id,
-    //             color: newColor
-    //         }] });
-    //         socket.on(input ,function(i){
-    //             const dat = Object.assign({}, that.state.data.filter(r => r.id === res.id)[0], { ping: i });
-    //             that.setState({
-    //                 data: that.state.data.map(r => (r.id === res.id ? Object.assign({}, dat) : r))
-    //             })
-    //         });
-    //         that.addDataSet(result, that, newColor)
-    //     });
-    // }
-    // removePing(i, that){
-    //     var label = i.target.innerHTML;
-    //     const labelTrimmed = label.replace(/ ×+$/, "").trim();
-    //     PingDelete(i.target.id).then(r => {
-    //         that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
-    //     });
-    // }
+
+    removeDataSet(i, that){
+        console.log('LineChart.removeDataSet');
+        const label = i.target.innerHTML;
+        const labelTrimmed = label.replace(/ ×+$/, "").trim();
+        PingDelete(i.target.id).then(r => {
+            that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
+        });
+    }
     onRefresh(chart){
+        // console.log('elem.state.data', elem ? elem.state.data : 'fuck off');
+        
         chart.data.datasets.forEach(function(dataset) {
             dataset.data.push({
                 x: Date.now(),
-                y: Math.random()
+                y: elem.state.data.length > 0 ? (elem.state.data.filter(r => r.host === dataset.label)[0].ping ? elem.state.data.filter(r => r.host === dataset.label)[0].ping.time : null ) : null
             });
         });
     }
     render() {
-        console.log(this.state);
-        const that = this;
-        const onRefresh = this.onRefresh;
-
+        console.log('LineChart.render.dataSets', this.state);
         const dataSets = this.state.dataSets;
+        const onRefresh = this.onRefresh;
         return ( 
                 <Line
                     data = {{ datasets: dataSets }}

@@ -13,27 +13,28 @@ import LineChart from '../../components/chart/lineChart'
 
 const chartColors = {
 	red: 'rgb(255, 99, 132)',
-    blue: 'rgb(54, 162, 235)',
-    green: 'rgb(75, 192, 192)',
+  blue: 'rgb(54, 162, 235)',
+  green: 'rgb(75, 192, 192)',
 	orange: 'rgb(255, 159, 64)',
-    grey: 'rgb(201, 203, 207)',
+  grey: 'rgb(201, 203, 207)',
 	yellow: 'rgb(255, 205, 86)',
 	purple: 'rgb(153, 102, 255)'
-
 };
 
 let colorNames = Object.keys(chartColors);
 const color = Chart.helpers.color;
+let elem; 
 
 export default class Home extends React.Component {
   constructor(props) {
     super(props);
     console.log('Home extends React.Component: ', props);
-
+    this.line = React.createRef();
     this.state = {
       data: [],
       dataSets: []
   };
+  elem = this;
   this.socket = io.connect();
 
   }
@@ -56,7 +57,7 @@ export default class Home extends React.Component {
                   data: that.state.data.map(r => (r.id === res.id ? Object.assign({}, dat) : r))
               })
           });
-          that.addDataSet(result, that, newColor)
+          that.line.current.addDataSet(result, that, newColor);
       });
   }
   removePing(i, that){
@@ -66,6 +67,14 @@ export default class Home extends React.Component {
           that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
       });
   }
+  // addDataSet(newDataset){
+  //   console.log(this);
+  //   console.log('Home.add');
+  //   //  elem.setState({ dataSets: [...elem.state.dataSets, newDataset] });
+  // }
+  // removeDataSet(){
+  //   console.log('REMOVE.add');
+  // }
   componentDidMount(){
       const that = this;
       this.socket.on('disconnect', function(){
@@ -87,7 +96,7 @@ export default class Home extends React.Component {
             }
           </div>
           <br />
-          <LineChart data={ this.state.data } />
+          <LineChart data={ this.state.data } ref={ this.line }  />
         </div>
     );
   }
