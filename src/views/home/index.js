@@ -67,14 +67,18 @@ export default class Home extends React.Component {
           that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
       });
   }
-  // addDataSet(newDataset){
-  //   console.log(this);
-  //   console.log('Home.add');
-  //   //  elem.setState({ dataSets: [...elem.state.dataSets, newDataset] });
-  // }
-  // removeDataSet(){
-  //   console.log('REMOVE.add');
-  // }
+  addDataSet(newDataset){
+    console.log('Home.add', newDataset);
+    elem.setState({ dataSets: [...elem.state.dataSets, newDataset] });
+  }
+  removeDataSet(i, that){
+    console.log('REMOVE.add');
+    const label = i.target.innerHTML;
+    const labelTrimmed = label.replace(/ ×+$/, "").trim();
+    PingDelete(i.target.id).then(r => {
+        that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
+    });
+  }
   componentDidMount(){
       const that = this;
       this.socket.on('disconnect', function(){
@@ -96,7 +100,7 @@ export default class Home extends React.Component {
             }
           </div>
           <br />
-          <LineChart data={ this.state.data } ref={ this.line }  />
+          <LineChart data={ this.state.data } dataSets={ this.state.dataSets } ref={ this.line } setData={ this.addDataSet } />
         </div>
     );
   }

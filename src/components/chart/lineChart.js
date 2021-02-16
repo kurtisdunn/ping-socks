@@ -41,21 +41,13 @@ export default class LineChart extends React.Component {
                 y: that.state.data.filter(r => r.id === res.id)[0].ping ? that.state.data.filter(r => r.id === res.id)[0].ping.time : null
             }]
         };
-        // this.props.addDataSet(newDataset)
-        that.setState({ dataSets: [...that.state.dataSets, newDataset] });
+        this.props.setData(newDataset);
+        // that.setState({ dataSets: [...that.state.dataSets, newDataset] });
+        // console.log(that.state);
     }
 
-    removeDataSet(i, that){
-        console.log('LineChart.removeDataSet');
-        const label = i.target.innerHTML;
-        const labelTrimmed = label.replace(/ ×+$/, "").trim();
-        PingDelete(i.target.id).then(r => {
-            that.setState({ data : that.state.data.filter(r => r.id != i.target.id), dataSets: that.state.dataSets.filter(r => r.label != labelTrimmed.replace(/ ×+$/, ""))  });
-        });
-    }
     onRefresh(chart){
         // console.log('elem.state.data', elem ? elem.state.data : 'fuck off');
-        
         chart.data.datasets.forEach(function(dataset) {
             dataset.data.push({
                 x: Date.now(),
@@ -64,7 +56,6 @@ export default class LineChart extends React.Component {
         });
     }
     render() {
-        console.log('LineChart.render.dataSets', this.state);
         const dataSets = this.state.dataSets;
         const onRefresh = this.onRefresh;
         return ( 
