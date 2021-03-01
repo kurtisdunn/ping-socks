@@ -20,15 +20,23 @@ export default class Summary extends React.Component {
         return null;
     }
     render() {
-        console.log(this.state.dataSet);
+        const data = this.state.data;
+        const ping = this.state.data.ping ? this.state.data.ping : null;
+        const dataSet = this.state.dataSet[0];
+        console.log(this.state.data);
+        console.log(this.state.dataSet[0]);
         return (
-            <div className="card text-white bg-dark mb-3" style={{maxWidth: '18rem'}}>
-                <div className="card-header">Header</div>
+            <div className="card text-white bg-dark mb-3" style={{ maxWidth: '18rem' }}>
+                <div className="card-header">{ this.state.data.host }</div>
                 <div className="card-body">
-                    <h5 className="card-title">Dark card title</h5>
-                    <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                    <p>Current: { ping ? ping.time : null } </p>
+                    <p>Mean: { dataSet ? (dataSet.data.reduce((a, b) => { return {y: a.y + b.y} }).y / dataSet.data.length).toFixed(3) : null } </p>
+                    <p>Max: {Math.max.apply(Math, dataSet ? dataSet.data.map(o => o.y) : [0]) }</p>
+                    <p>Min: {Math.min.apply(Math, dataSet ? dataSet.data.map(o => o.y) : [0]) }</p>
                 </div>
             </div>
         );
     }
 }
+
+
