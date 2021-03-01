@@ -7,15 +7,12 @@ let sock;
 
 
 module.exports = function(app, io){
-        io.on('connection', function(client){
-            // console.log('connected');
-            sock = client;
-            client.on("disconnect",function(){
-                // console.log("client disconnected: ", client.id);
-                pings = [];
-            });
+    io.on('connection', function(client){
+        sock = client;
+        client.on("disconnect",function(){
+            pings = [];
         });
-
+    });
 
     app.get('/api/test', function(req, res){
         res.status(200).json({'test': 'test'}) 
@@ -23,10 +20,8 @@ module.exports = function(app, io){
 
     // New Ping!
     app.post('/api/ping', function(req, res){
-
         const ping = new Ping(io, sock, Guid(), req.body.data);
         pings.push(ping)
-        const current = pings.filter(r => r.host === 'google.com');
         res.status(200).json({
                 "id": ping.getguid(), 
                 "hosts": req.body.data
