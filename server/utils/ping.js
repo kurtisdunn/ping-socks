@@ -29,9 +29,9 @@ module.exports = class Ping {
         this.runningPing = runningPing;
     }
     terminatePing() {
-        console.log("terminate");
+        console.log("terminate: ", this.guid);
         this.runningPing ? clearInterval(this.runningPing) : null;
-        this.sock.disconnect();
+        // this.sock.disconnect();
     }
     socket() {
         const that = this;
@@ -39,7 +39,7 @@ module.exports = class Ping {
         this.sock.on("disconnect", function () {
             // console.log("client disconnected sdfsdafdsa: ", that.sock.id);
             clearInterval(that.runningPing);
-            that.terminatePing();
+            // that.terminatePing();
         });
     }
 }

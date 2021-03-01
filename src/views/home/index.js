@@ -10,6 +10,7 @@ import PingDelete from '../../api/ping/delete'
 import Button from '../../components/button';
 import Input from '../../components/input';
 import LineChart from '../../components/chart/lineChart'
+import Summary from '../../components/summary';
 
 const chartColors = {
 	red: 'rgb(255, 99, 132)',
@@ -22,7 +23,7 @@ const chartColors = {
 };
 
 let colorNames = Object.keys(chartColors);
-const color = Chart.helpers.color;
+
 let elem; 
 
 export default class Home extends React.Component {
@@ -101,6 +102,10 @@ export default class Home extends React.Component {
           </div>
           <br />
           <LineChart data={ this.state.data } dataSets={ this.state.dataSets } ref={ this.line } setData={ this.addDataSet } />
+          <br /> 
+          {
+              data.length > 0 ? data.map((i, k) => <Summary data={i} dataSet={this.state.dataSets.filter(r => r.label === i.host)} key={k}/>) : null
+          }
         </div>
     );
   }

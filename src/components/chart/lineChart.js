@@ -13,7 +13,6 @@ export default class LineChart extends React.Component {
         this.state = {
             data: []
         };
-        var handleToUpdate  =   this.props.handleToUpdate
         elem = this;
     }
     static getDerivedStateFromProps(props, current_state) {
