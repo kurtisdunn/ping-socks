@@ -49,7 +49,7 @@ export default class LineChart extends React.Component {
         // console.log('elem.state.data', elem ? elem.state.data : 'fuck off');
         chart.data.datasets.forEach(function(dataset) {
             dataset.data.push({
-                x: Date.now(),
+                x: elem.state.data.length > 0 ? (elem.state.data.filter(r => r.host === dataset.label)[0].ping ? elem.state.data.filter(r => r.host === dataset.label)[0].ping.timestamp : null ) : null,
                 y: elem.state.data.length > 0 ? (elem.state.data.filter(r => r.host === dataset.label)[0].ping ? elem.state.data.filter(r => r.host === dataset.label)[0].ping.time : null ) : null
             });
         });

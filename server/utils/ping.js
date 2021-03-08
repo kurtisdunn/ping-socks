@@ -1,18 +1,18 @@
 const ping = require('ping');
 
 module.exports = class Ping {
-    constructor(io, sock, guid, host) {
+    constructor(io, sock, guid, data) {
         this.io = io;
         this.sock = sock;
         this.guid = guid;
-        this.host = host;
+        this.host = data.host;
+        this.interval = data.interval ? data.interval : '1'
         this.runningPing = null;
         this.terminatePing = this.terminatePing;
         //Kick off the sequence. 
-        if (host != null) {
-            this.socket(host);
+        if (this.host != null) {
+            this.socket(this.host);
         }
-
     }
     getguid() {
         return this.guid;
@@ -20,12 +20,17 @@ module.exports = class Ping {
     startPing() {
         const that = this;
         const host = this.host;
+        const interval = this.interval;
+        const timeoutinterval = `${interval}${'000'}`;
         const runningPing = setInterval(() => {
-            ping.promise.probe(host).then(res => {
+            const timestamp = Date.now();
+            ping.promise.probe(host, {
+                extra: ['-i', interval]
+            }).then(res => {
                 // console.log(res.host, res.time);
-                res.host === 'unknown' ? this.terminatePing : that.io.emit(host, res);
+                res.host === 'unknown' ? this.terminatePing : that.io.emit(host, Object.assign(res, {timestamp, interval: interval}));
             });
-        }, 1000)
+        }, timeoutinterval)
         this.runningPing = runningPing;
     }
     terminatePing() {
@@ -37,9 +42,8 @@ module.exports = class Ping {
         const that = this;
         that.startPing();
         this.sock.on("disconnect", function () {
-            // console.log("client disconnected sdfsdafdsa: ", that.sock.id);
             clearInterval(that.runningPing);
-            // that.terminatePing();
+            that.terminatePing();
         });
     }
 }
