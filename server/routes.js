@@ -2,9 +2,7 @@ const Ping = require('./utils/ping');
 const Guid = require('./utils/guid');
 
 let pings = [];
-
 let sock;
-
 
 module.exports = function(app, io){
     io.on('connection', function(client){

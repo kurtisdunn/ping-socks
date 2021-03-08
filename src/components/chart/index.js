@@ -111,7 +111,6 @@ export default class DefaultChart extends React.Component {
           const newdata = that.state.data[that.state.data.findIndex(el => el.id === res.id)] = dat;
         });
 
-
         var newDataset = {
           label: input,
           backgroundColor: color(newColor).alpha(0.5).rgbString(),
@@ -131,9 +130,7 @@ export default class DefaultChart extends React.Component {
         }, 500);
       });
     });
-    
-    
-  }
+  }+9
   remove(i, that){
     PingDelete(i.target.id).then(r => {
       const data = that.state.data.filter(r => r.id != i.target.id);
